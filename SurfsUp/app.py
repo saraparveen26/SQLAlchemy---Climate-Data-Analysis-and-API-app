@@ -55,7 +55,6 @@ def homepage():
 def precipitation():
     """Retrieve last 12 months of data"""
 
-    
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
@@ -88,3 +87,32 @@ def precipitation():
     # Return the JSON representation of dictionary.
     return jsonify(prcp_data)
 
+
+@app.route("/api/v1.0/stations")
+def stations():
+    """Get a list of stations"""
+    
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    # Perform a query to retrieve the station data
+    prcp_scores = session.query(Measurement.date, Measurement.prcp).\
+                filter(Measurement.date >= latest_year_date).\
+                order_by(Measurement.date).all()
+    
+    # Close the session
+    session.close()
+    
+    # Create a dictionary using date s the key and prcp as the value
+    prcp_data = []
+    for date, prcp in prcp_scores:
+        prcp_dict = {}
+        prcp_dict[date] = prcp
+        prcp_data.append(prcp_dict)
+    prcp_data
+    
+    # Return a JSON list of stations from the dataset.
+    return jsonify(prcp_data)
+
+if __name__ == '__main__':
+    app.run(debug=True)
