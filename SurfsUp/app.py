@@ -95,7 +95,7 @@ def stations():
     session = Session(engine)
 
     # Perform a query to retrieve the station data
-    station_data = session.query(Station.name).all()
+    station_data = session.query(Station.station).all()
     
     # Close the session
     session.close()
@@ -137,7 +137,7 @@ def tobs():
     session.close()
     
     # Convert list of tuples into normal list
-    station_temp_list = list(station_temp_data)
+    station_temp_list = list(np.ravel(station_temp_data))
     
     # Return a JSON list of temperature data of previous year for the most active station (USC00519281)
     return jsonify(station_temp_list)
@@ -225,6 +225,8 @@ def start_end(start, end):
     # maximum temperature calculated from the given start date to the given end date
     return jsonify(start_end_data_list)
 
+
+#################################################
 
 if __name__ == '__main__':
     app.run(debug=True)
