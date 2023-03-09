@@ -1,11 +1,14 @@
+# Import dependencies and setup
 import numpy as np
 import datetime as dt
 
+# Python SQL toolkit and Object Relational Mapper
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
 
+# Import Flask
 from flask import Flask, jsonify
 
 #################################################
