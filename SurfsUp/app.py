@@ -38,16 +38,28 @@ app = Flask(__name__)
 
 @app.route("/")
 def homepage():
-    """List all available api routes."""
+    """List all available API routes."""
     return (
         f"Welcome to SurfsUp API<br/>"
-        f"_______________________<br/>"
         f"Available Routes:<br/>"
+        f"_______________________<br/>"
+        f"Precipitation data for last 12 months (2016-08-24 to 2017-08-23):<br/>"
         f"/api/v1.0/precipitation<br/>"
+        f"_______________________<br/>"
+        f"List of stations in the dataset:<br/>"
         f"/api/v1.0/stations<br/>"
+        f"_______________________<br/>"
+        f"Date and temperature observations of the most-active station (USC00519281) for previous year:<br/>"
         f"/api/v1.0/tobs<br/>"
+        f"_______________________<br/>"
+        f"Minimum, Maximum and average temperature from a given start date to end of dataset:<br/>"
+        f"Please enter Start Date in the format: YYYY-MM-DD<br/>"
         f"/api/v1.0/<start><br/>"
-        f"/api/v1.0/<start>/<end>"
+        f"_______________________<br/>"
+        f"Minimum, Maximum and average temperature from a given start date to a given end date:<br/>"
+        f"Please enter Start Date and End Date in the format: YYYY-MM-DD/YYYY-MM-DD<br/>"
+        f"/api/v1.0/<start>/<end><br/>"
+        f"_______________________"
     )
 
 
@@ -66,7 +78,7 @@ def precipitation():
     latest_date = session.query(Measurement.date).order_by(Measurement.date.desc()).first().date
 
     # Calculate the date one year from the last date in data set.
-    year_ago_date = dt.date(2017,8,23) - dt.timedelta(days = 365)
+    year_ago_date = dt.datetime.strptime(latest_date, '%Y-%m-%d') - dt.timedelta(days=365)
 
     # Perform a query to retrieve the data and precipitation scores
     prcp_scores = session.query(Measurement.date, Measurement.prcp).\
@@ -77,14 +89,12 @@ def precipitation():
     session.close()
     
     # Create a dictionary using date as the key and prcp as the value
-    prcp_data = []
+    prcp_dict = {}
     for date, prcp in prcp_scores:
-        prcp_dict = {}
         prcp_dict[date] = prcp
-        prcp_data.append(prcp_dict)
     
     # Return the JSON representation of dictionary.
-    return jsonify(prcp_data)
+    return jsonify(prcp_dict)
 
 
 @app.route("/api/v1.0/stations")
@@ -118,7 +128,7 @@ def tobs():
     latest_date = session.query(Measurement.date).order_by(Measurement.date.desc()).first().date
 
     # Calculate the date one year from the last date in data set.
-    year_ago_date = dt.date(2017,8,23) - dt.timedelta(days = 365)
+    year_ago_date = dt.datetime.strptime(latest_date, '%Y-%m-%d') - dt.timedelta(days=365)
 
     # Find the most active station id
     most_active_station = session.query(Measurement.station).\
@@ -136,8 +146,13 @@ def tobs():
     # Close the session
     session.close()
     
-    # Convert list of tuples into normal list
-    station_temp_list = list(np.ravel(station_temp_data))
+    # Create a list of dictionary containing dates and temperatures observations
+    station_temp_list = []
+    for date, temp in station_temp_data:
+        station_temp_dict = {}
+        station_temp_dict["date"] = date
+        station_temp_dict["temp"] = temp
+        station_temp_list.append(station_temp_dict)
     
     # Return a JSON list of temperature data of previous year for the most active station (USC00519281)
     return jsonify(station_temp_list)
@@ -165,19 +180,16 @@ def start(start):
     
     # Close the session
     session.close()
-    
-    # Convert list of tuples into normal list
-    start_data_list = list(np.ravel(start_data))
 
-    # Create a dictionary to store date, min, max and avg temperature values
-    start_data_list1 = []
+    # Create a list of dictionary to store date, min, max and avg temperature values
+    start_data_list = []
     for date, min, max, avg in start_data:
         start_dict = {}
         start_dict["date"] = date
         start_dict["min_temp"] = min
         start_dict["max_temp"] = max
         start_dict["avg_temp"] = avg
-        start_data_list1.append(start_dict)
+        start_data_list.append(start_dict)
     
     # Return a JSON list of the minimum temperature, the average temperature, and the
     # maximum temperature calculated from the given start date to the end of the dataset
@@ -207,19 +219,16 @@ def start_end(start, end):
     
     # Close the session
     session.close()
-    
-    # Convert list of tuples into normal list
-    start_end_data_list = list(np.ravel(start_end_data))
 
-    # Create a dictionary to store date, min, max and avg temperature values
-    start_end_data_list1 = []
+    # Create a list of dictionary to store date, min, max and avg temperature values
+    start_end_data_list = []
     for date, min, max, avg in start_end_data:
         start_dict = {}
         start_dict["date"] = date
         start_dict["min_temp"] = min
         start_dict["max_temp"] = max
         start_dict["avg_temp"] = avg
-        start_end_data_list1.append(start_dict)
+        start_end_data_list.append(start_dict)
     
     # Return a JSON list of the minimum temperature, the average temperature, and the
     # maximum temperature calculated from the given start date to the given end date
