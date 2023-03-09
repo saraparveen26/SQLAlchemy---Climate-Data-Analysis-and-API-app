@@ -31,9 +31,9 @@ The second part of the analysis includes station data. This includes the followi
 
 1. Calculating the total number of stations in the dataset.
 
-2. Finding the most activae station by designing a query which counts the rows for each station, lists the stations and observation counts in descending order and odentifies the station with the greatest number of observations.
+2. Finding the most activae station by designing a query which counts the rows for each station, lists the stations and observation counts in descending order and identifies the station with the greatest number of observations.
 
-3. Query the data to find the lowest, highest and average temperature for the most active station.
+3. Querying the data to find the lowest, highest and average temperatures for the most active station.
 
 4. Retrieving the previous 12 months of temperature observation (TOBS) data for the most active station.
 
@@ -49,21 +49,25 @@ The session is closed after performing the above climate analysis.
 This section of the project designs a Flask API based on the queries and analyses peformed in Part 1. The following routes are created using Flask:
 
 1. /
+
     This is the homepage and lists all available API routes.
 
 2. /api/v1.0/precipitation
+
     This route performs a query and returns JSON representation of a dictionary of the precipitation data for the last 12 months using 'date' as the key and 'prcp' as the value.
 
 3. /api/v1.0/stations
+
     This route performs a query and returns a JSON list of all stations from the dataset.
 
 4. /api/v1.0/tobs
-    This route performs a query and returns a JSON list of dictionary containing dates and remperature observations for the previous year of the most activate station (USC00519281).
 
-5. /api/v1.0/<start>
+    This route performs a query and returns a JSON list of dictionary containing dates and temperature observations of the most active station (USC00519281) for the previous year.
+
+5. /api/v1.0/<*start*>
+
     This route performs a query and returns a JSON list of dictionary containing date, minimum temperature, maximum temperature and average remperature data for all the dates greater than or equal to the start date. The start date is accpeted in the formart YYYY-MM-DD as a parameter from the URL.
 
-6. /api/v1.0/<start>/<end>
+6. /api/v1.0/<*start*>/<*end*>
+
     This route performs a query and returns a JSON list of dictionary containing date, minimum temperature, maximum temperature and average remperature data for all the dates from the start date to the end date, inclusive. The start date and end date are accpeted in the formart YYYY-MM-DD/YYYY-MM-DD as parameters from the URL.
-
-
